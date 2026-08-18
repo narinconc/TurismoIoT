@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reto IoT · Administración Turística y Hotelera</title>
+<style>
+:root{--gold:#c8a53b;--dark:#17324d;--blue:#24598f;--green:#287d4b;--red:#bd3b3b;--cream:#fffaf0;--ink:#20242a}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#f5f8f8,#fff8df);color:var(--ink)}
+header{background:var(--dark);color:white;padding:18px 20px;border-bottom:6px solid var(--gold)}
+.head{max-width:920px;margin:auto;display:flex;align-items:center;gap:18px}
+.logo{width:92px;height:76px;object-fit:contain;background:white;border-radius:10px;padding:5px}
+h1{margin:0;font-size:clamp(24px,4vw,34px)} .sub{margin-top:5px;color:#e8e8e8}
+main{max-width:900px;margin:24px auto;padding:0 15px}
+.card{background:white;border-radius:20px;padding:25px;box-shadow:0 7px 24px rgba(0,0,0,.08)}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.badge{background:#fff3c4;border:1px solid #ddc267;border-radius:20px;padding:8px 12px;font-weight:800}
+.progress{height:11px;background:#e5e5e5;border-radius:20px;overflow:hidden;margin:16px 0 25px}
+.progress i{display:block;height:100%;width:0;background:var(--gold);transition:.3s}
+.qnum{font-weight:800;color:#755d16;text-transform:uppercase;letter-spacing:.5px}
+.question{font-size:22px;font-weight:750;line-height:1.4;margin:10px 0 20px}
+.context{background:#f2f6fa;border-left:5px solid var(--blue);padding:14px 16px;border-radius:10px;margin:14px 0 19px;line-height:1.5}
+.options{display:grid;gap:11px}
+.option{border:2px solid #ddd;background:white;border-radius:13px;padding:14px;text-align:left;font-size:16px;cursor:pointer;transition:.18s}
+.option:hover{border-color:var(--gold);transform:translateY(-1px)}
+.option.selected{border-color:var(--blue);background:#edf5ff}
+.option.correct{border-color:var(--green);background:#eaf8ee}
+.option.wrong{border-color:var(--red);background:#fff0f0}
+.check{display:flex;gap:11px;align-items:flex-start;border:2px solid #ddd;border-radius:13px;padding:13px;cursor:pointer}
+.check input{width:19px;height:19px;margin-top:2px}
+input[type=text],textarea{width:100%;padding:14px;border:2px solid #ddd;border-radius:12px;font-size:16px;margin:8px 0 14px}
+.feedback{display:none;margin-top:18px;padding:16px;border-radius:13px;font-weight:600;line-height:1.55}
+.feedback.ok{display:block;background:#eaf8ee;color:#155c29;border:1px solid #8bc99a}
+.feedback.bad{display:block;background:#fff0f0;color:#7c2020;border:1px solid #e1a2a2}
+.actions{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+button{border:0;border-radius:12px;padding:13px 20px;font-size:16px;font-weight:800;cursor:pointer}
+.primary{background:var(--dark);color:white} .secondary{background:#e9e9e9;color:#222}
+.hidden{display:none!important}
+.score{text-align:center;font-size:58px;font-weight:900;color:#846a18}
+.level{text-align:center;font-size:24px;font-weight:800}
+.review{margin-top:20px} .review div{padding:12px;border-bottom:1px solid #ddd}
+footer{text-align:center;color:#666;padding:20px;font-size:14px}
+small{color:#666}
+@media(max-width:650px){.question{font-size:20px}.head{align-items:flex-start}}
+</style>
+</head>
+<body>
+<header>
+<div class="head">
+<img class="logo" src="data:image/png;base64,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" alt="Logo Administración Turística y Hotelera">
+<div><h1>🧳 Misión: Turismo + IoT</h1><div class="sub">Reto interactivo · Administración Turística y Hotelera</div></div>
+</div>
+</header>
+
+<main>
+<section id="intro" class="card">
+<div class="top"><span class="badge">10 retos · retroalimentación inmediata</span><span>🎯 Analiza antes de responder</span></div>
+<h2>¿Aceptas la misión?</h2>
+<p>En este reto no encontrarás exactamente los ejemplos que vimos durante la explicación. Tendrás que <strong>transferir lo aprendido a situaciones nuevas del sector turístico y hotelero</strong>.</p>
+<div class="context"><strong>Recuerda:</strong> para reconocer IoT analiza el objeto, los datos, la conectividad y qué ocurre con esa información. Un sensor por sí solo no convierte un sistema en IoT.</div>
+<button class="primary" id="start">▶ Iniciar misión</button>
+</section>
+
+<section id="quiz" class="card hidden">
+<div class="top"><span id="num" class="qnum"></span><span id="score" class="badge">Puntaje: 0</span></div>
+<div class="progress"><i id="prog"></i></div>
+<div id="area"></div>
+<div id="feed" class="feedback" aria-live="polite"></div>
+<div class="actions">
+<button id="check" class="primary">Comprobar respuesta</button>
+<button id="next" class="secondary hidden">Siguiente →</button>
+</div>
+</section>
+
+<section id="result" class="card hidden"></section>
+</main>
+<footer>Elaborado por <strong>Ing. Nancy Rincón Calixto</strong> · Administración Turística y Hotelera</footer>
+
+<script>
+const questions = [
+{
+ t:"s",
+ q:"Una agencia entrega a cada turista una pulsera que funciona como llave de acceso a ciertas experiencias. La pulsera solo almacena localmente la autorización y el lector del lugar valida la entrada sin enviar información a Internet. ¿Qué es principalmente?",
+ o:["Una solución IoT porque utiliza una pulsera electrónica.","Un sistema de identificación/control de acceso, pero no necesariamente IoT.","Un sistema IoT porque toda llave digital usa Internet.","Un sistema de inteligencia artificial."],
+ a:1,
+ e:"La identificación electrónica no implica automáticamente IoT. En este caso no se describe comunicación de datos por una red hacia otros servicios."
+},
+{
+ t:"m",
+ q:"Un museo turístico quiere ofrecer una experiencia personalizada mediante dispositivos conectados. ¿Cuáles acciones podrían aprovechar IoT?",
+ o:["Detectar qué sala está visitando el dispositivo del visitante y ofrecer información contextual.","Recibir datos de sensores instalados en determinadas piezas o espacios.","Usar los datos para conocer patrones generales de recorrido.","Recoger obligatoriamente nombre, documento y fotografía de cada visitante."],
+ a:[0,1,2],
+ e:"IoT puede aportar información contextual y datos de uso, pero no obliga a recolectar datos personales que no sean necesarios."
+},
+{
+ t:"s",
+ q:"En un parque de aventura, un dispositivo instalado en una ruta registra vibraciones anormales en un puente y envía una alerta al centro de operaciones. ¿Qué elemento convierte la medición en una acción útil?",
+ o:["El color del dispositivo.","La comunicación de los datos y el sistema que los procesa para generar una alerta.","Que el puente sea turístico.","Que el visitante lleve celular."],
+ a:1,
+ e:"El valor está en que el dato capturado se comunica, se interpreta y desencadena una acción de atención."
+},
+{
+ t:"f",
+ q:"Completa: cuando varios objetos recopilan y comparten información mediante una red para prestar un servicio, hablamos de Internet de las ________.",
+ a:["cosas"],
+ e:"La expresión es Internet de las Cosas (IoT): objetos físicos conectados que pueden recopilar, intercambiar o utilizar datos."
+},
+{
+ t:"s",
+ q:"Una empresa de turismo de naturaleza instala un sensor en un sendero que mide el nivel de humedad del suelo. El dato se envía a una plataforma que advierte al personal cuando existe riesgo de deterioro del camino. ¿Qué propósito tiene principalmente el sistema?",
+ o:["Recopilar datos para apoyar decisiones de gestión del sendero.","Identificar personalmente a todos los visitantes.","Reemplazar al guía turístico.","Crear automáticamente publicidad."],
+ a:0,
+ e:"El sistema convierte una medición ambiental en información útil para gestionar el sendero y prevenir problemas."
+},
+{
+ t:"m",
+ q:"Una empresa quiere implementar IoT en un servicio turístico. Antes de instalar los dispositivos, ¿qué decisiones son importantes?",
+ o:["Definir qué problema se quiere solucionar.","Determinar qué datos son realmente necesarios.","Pensar cómo se conectarán y dónde se utilizarán los datos.","Analizar costos, mantenimiento y seguridad.","Comprar sensores sin saber para qué se utilizarán."],
+ a:[0,1,2,3],
+ e:"Una solución IoT debe partir de una necesidad. También requiere definir datos, conectividad, operación, seguridad, costos y mantenimiento."
+},
+{
+ t:"s",
+ q:"Un centro de información turística instala una pantalla que muestra horarios y recomendaciones, pero los contenidos son actualizados manualmente por un empleado. ¿Por qué no debemos llamarlo automáticamente IoT?",
+ o:["Porque una pantalla nunca puede pertenecer a IoT.","Porque no se describe un objeto conectado que genere/intercambie datos automáticamente para prestar el servicio.","Porque las pantallas solo sirven para publicidad.","Porque IoT solo funciona en hoteles."],
+ a:1,
+ e:"Una pantalla digital puede ser un recurso tecnológico, pero para considerarla parte de una solución IoT debemos encontrar objetos conectados, datos y comunicación dentro del sistema."
+},
+{
+ t:"s",
+ q:"Un hotel quiere saber cuándo una habitación necesita mantenimiento. En lugar de preguntar al huésped, instala dispositivos que registran automáticamente ciertas condiciones del equipo y envían alertas al área de mantenimiento. ¿Cuál es la principal ventaja?",
+ o:["Permitir mantenimiento basado en información del estado del equipo.","Eliminar todos los trabajadores del hotel.","Garantizar que ningún equipo fallará.","Evitar cualquier costo de mantenimiento."],
+ a:0,
+ e:"Los datos de los dispositivos pueden ayudar a detectar condiciones que requieren atención y mejorar la gestión del mantenimiento."
+},
+{
+ t:"m",
+ q:"Una empresa turística analiza datos obtenidos por dispositivos IoT. ¿Qué buenas prácticas debería considerar?",
+ o:["Recoger solamente los datos necesarios.","Proteger la información frente a accesos no autorizados.","Explicar de manera clara para qué se utilizan los datos cuando corresponda.","Guardar todos los datos indefinidamente por si algún día sirven."],
+ a:[0,1,2],
+ e:"El uso responsable implica minimizar datos, protegerlos y ser transparente sobre su finalidad. Guardar todo indefinidamente aumenta riesgos y no siempre es necesario."
+},
+{
+ t:"x",
+ q:"RETO FINAL: Una empresa de turismo de aventura quiere mejorar la seguridad de una actividad sin convertir la experiencia en un proceso invasivo para el visitante. Propón una solución IoT diferente de los ejemplos vistos en clase.",
+ e:"Tu propuesta debe explicar: problema, objeto o dispositivo, qué detecta o mide, conectividad, datos, qué sistema recibe/procesa la información, qué acción se genera, beneficio turístico y una medida de privacidad o seguridad."
+}
+];
+
+let current=0,score=0,answered=false,results=[];
+
+const $=id=>document.getElementById(id);
+
+$("start").addEventListener("click",()=>{
+ $("intro").classList.add("hidden");
+ $("quiz").classList.remove("hidden");
+ render();
+});
+
+$("check").addEventListener("click",check);
+$("next").addEventListener("click",next);
+
+function render(){
+ answered=false;
+ $("feed").className="feedback";
+ $("feed").innerHTML="";
+ $("check").classList.remove("hidden");
+ $("next").classList.add("hidden");
+ $("num").textContent=`Reto ${current+1} de ${questions.length}`;
+ $("score").textContent=`Puntaje: ${score}`;
+ $("prog").style.width=`${current/questions.length*100}%`;
+
+ const q=questions[current];
+ let h=`<div class="question">${q.q}</div>`;
+
+ if(q.t==="s"){
+   h+=`<div class="options">`;
+   q.o.forEach((x,i)=>h+=`<button type="button" class="option" data-i="${i}">${String.fromCharCode(65+i)}. ${x}</button>`);
+   h+=`</div>`;
+ }
+ if(q.t==="m"){
+   h+=`<div class="options">`;
+   q.o.forEach((x,i)=>h+=`<label class="check"><input type="checkbox" value="${i}">${x}</label>`);
+   h+=`</div><p><small>Selecciona todas las respuestas correctas.</small></p>`;
+ }
+ if(q.t==="f"){
+   h+=`<label for="fill"><strong>Escribe la palabra que completa la idea:</strong></label><input id="fill" type="text" placeholder="Tu respuesta...">`;
+ }
+ if(q.t==="x"){
+   h+=`<div class="context"><strong>Producto esperado:</strong> no tienes que construir físicamente el dispositivo. Diseña conceptualmente el sistema y explica cómo funcionaría.</div>
+   <label for="finalText"><strong>Escribe tu propuesta:</strong></label>
+   <textarea id="finalText" rows="9" placeholder="Describe tu solución IoT..."></textarea>`;
+ }
+ $("area").innerHTML=h;
+
+ document.querySelectorAll(".option").forEach(btn=>btn.addEventListener("click",()=>{
+   if(answered)return;
+   document.querySelectorAll(".option").forEach(b=>b.classList.remove("selected"));
+   btn.classList.add("selected");
+ }));
+}
+
+function feedback(ok,msg){
+ $("feed").className="feedback "+(ok?"ok":"bad");
+ $("feed").innerHTML=msg;
+}
+
+function check(){
+ if(answered)return;
+ const q=questions[current];
+ let ok=false;
+
+ if(q.t==="s"){
+   const selected=document.querySelector(".option.selected");
+   if(!selected){feedback(false,"Primero selecciona una respuesta.");return;}
+   const i=Number(selected.dataset.i);
+   ok=i===q.a;
+   document.querySelectorAll(".option").forEach((b,j)=>{
+     if(j===q.a)b.classList.add("correct");
+     else if(j===i)b.classList.add("wrong");
+   });
+ }
+
+ if(q.t==="m"){
+   const v=[...document.querySelectorAll(".check input:checked")].map(x=>Number(x.value)).sort((a,b)=>a-b);
+   if(!v.length){feedback(false,"Selecciona al menos una opción.");return;}
+   ok=JSON.stringify(v)===JSON.stringify([...q.a].sort((a,b)=>a-b));
+   document.querySelectorAll(".check").forEach((r,i)=>{
+     if(q.a.includes(i))r.style.borderColor="#287d4b";
+     else if(v.includes(i))r.style.borderColor="#bd3b3b";
+   });
+ }
+
+ if(q.t==="f"){
+   const v=$("fill").value.trim().toLowerCase();
+   if(!v){feedback(false,"Escribe una respuesta.");return;}
+   ok=q.a.some(x=>v.includes(x));
+ }
+
+ if(q.t==="x"){
+   const v=$("finalText").value.trim();
+   if(v.length<50){feedback(false,"Desarrolla un poco más la propuesta para poder analizarla.");return;}
+   const s=v.toLowerCase();
+   const keys=["problema","sensor","dispositivo","conect","dato","plataforma","acción","accion","alerta","seguridad","privacidad"];
+   ok=keys.filter(k=>s.includes(k)).length>=5;
+ }
+
+ if(ok)score++;
+ results.push(ok);
+ answered=true;
+ $("score").textContent=`Puntaje: ${score}`;
+ feedback(ok,(ok?"✅ ¡Reto superado! ":"❌ Aún no. ")+q.e);
+ $("check").classList.add("hidden");
+ $("next").classList.remove("hidden");
+}
+
+function next(){
+ if(current<questions.length-1){current++;render();}
+ else finish();
+}
+
+function finish(){
+ const pct=Math.round(score/questions.length*100);
+ const level=pct>=90?"🏆 Excelente dominio":pct>=70?"🚀 Buen dominio":"🔧 En construcción";
+ $("quiz").classList.add("hidden");
+ $("result").classList.remove("hidden");
+
+ const review=results.map((r,i)=>`<div>Reto ${i+1}: ${r?"✅ Correcto":"❌ Para revisar"}</div>`).join("");
+
+ $("result").innerHTML=`
+ <div class="score">${pct}%</div>
+ <div class="level">${level}</div>
+ <p style="text-align:center"><strong>Acertaste ${score} de ${questions.length} retos.</strong></p>
+ <div class="review"><h3>Resumen de la misión</h3>${review}</div>
+ <div class="context"><strong>Para continuar en clase:</strong> piensa en un problema turístico que todavía no tenga una solución tecnológica evidente. ¿Podría IoT aportar algo sin convertir al turista en una fuente permanente de datos?</div>
+ <div style="text-align:center"><button class="primary" id="again">↻ Intentar nuevamente</button></div>`;
+
+ $("again").addEventListener("click",()=>location.reload());
+}
+</script>
+</body>
+</html>
